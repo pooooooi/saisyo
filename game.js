@@ -4,6 +4,17 @@ const canvas = document.getElementById("game");
 const statusEl = document.getElementById("status");
 const scoreEl = document.getElementById("score");
 const difficultyEl = document.getElementById("difficulty");
+const touchControlsEl = document.querySelector(".touch-controls");
+const touchButtons = {
+  up: document.getElementById("btn-up"),
+  down: document.getElementById("btn-down"),
+  left: document.getElementById("btn-left"),
+  right: document.getElementById("btn-right"),
+  jump: document.getElementById("btn-jump"),
+  dash: document.getElementById("btn-dash"),
+  camLeft: document.getElementById("btn-cam-left"),
+  camRight: document.getElementById("btn-cam-right"),
+};
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x8fd4ff);
@@ -413,6 +424,8 @@ const input = {
   jump: false,
   jumpPressed: false,
   sprint: false,
+  camLeft: false,
+  camRight: false,
 };
 
 const cameraControl = {
@@ -815,6 +828,10 @@ function updateClearEffects(dt) {
 }
 
 function updateCamera(dt) {
+  const touchTurnSpeed = 1.85;
+  if (input.camLeft) cameraControl.yaw += touchTurnSpeed * dt;
+  if (input.camRight) cameraControl.yaw -= touchTurnSpeed * dt;
+
   if (state.won) {
     const focus = world.goalFlag.position.clone().add(new THREE.Vector3(-1.0, 1.6, 0));
     const angle = state.clearTimer * 0.9;
@@ -890,6 +907,66 @@ window.addEventListener("keyup", (e) => {
   if (e.code === "ShiftLeft" || e.code === "ShiftRight") input.sprint = false;
 });
 
+function bindHoldButton(el, onPress, onRelease) {
+  if (!el) return;
+
+  const press = (e) => {
+    e.preventDefault();
+    onPress();
+  };
+  const release = (e) => {
+    e.preventDefault();
+    onRelease();
+  };
+
+  el.addEventListener("pointerdown", press);
+  el.addEventListener("pointerup", release);
+  el.addEventListener("pointercancel", release);
+  el.addEventListener("pointerleave", release);
+}
+
+bindHoldButton(touchButtons.up, () => {
+  input.forward = true;
+}, () => {
+  input.forward = false;
+});
+bindHoldButton(touchButtons.down, () => {
+  input.back = true;
+}, () => {
+  input.back = false;
+});
+bindHoldButton(touchButtons.left, () => {
+  input.left = true;
+}, () => {
+  input.left = false;
+});
+bindHoldButton(touchButtons.right, () => {
+  input.right = true;
+}, () => {
+  input.right = false;
+});
+bindHoldButton(touchButtons.dash, () => {
+  input.sprint = true;
+}, () => {
+  input.sprint = false;
+});
+bindHoldButton(touchButtons.camLeft, () => {
+  input.camLeft = true;
+}, () => {
+  input.camLeft = false;
+});
+bindHoldButton(touchButtons.camRight, () => {
+  input.camRight = true;
+}, () => {
+  input.camRight = false;
+});
+bindHoldButton(touchButtons.jump, () => {
+  input.jump = true;
+  input.jumpPressed = true;
+}, () => {
+  input.jump = false;
+});
+
 if (difficultyEl) {
   difficultyEl.addEventListener("change", (e) => {
     const level = e.target.value;
@@ -922,6 +999,55 @@ window.addEventListener("mousemove", (e) => {
 canvas.addEventListener("wheel", (e) => {
   cameraControl.distance = THREE.MathUtils.clamp(cameraControl.distance + e.deltaY * 0.01, 5, 20);
 });
+
+let touchLookId = null;
+canvas.addEventListener("touchstart", (e) => {
+  if (e.touches.length !== 1) return;
+  const targetIsUi = touchControlsEl && touchControlsEl.contains(e.target);
+  if (targetIsUi) return;
+  const t = e.changedTouches[0];
+  touchLookId = t.identifier;
+  cameraControl.prevX = t.clientX;
+  cameraControl.prevY = t.clientY;
+}, { passive: true });
+
+canvas.addEventListener("touchmove", (e) => {
+  if (touchLookId === null) return;
+
+  for (const t of e.changedTouches) {
+    if (t.identifier !== touchLookId) continue;
+
+    const dx = t.clientX - cameraControl.prevX;
+    const dy = t.clientY - cameraControl.prevY;
+    cameraControl.prevX = t.clientX;
+    cameraControl.prevY = t.clientY;
+
+    cameraControl.yaw -= dx * 0.0065;
+    cameraControl.pitch = THREE.MathUtils.clamp(cameraControl.pitch - dy * 0.0045, 0.1, 1.1);
+    e.preventDefault();
+    break;
+  }
+}, { passive: false });
+
+canvas.addEventListener("touchend", (e) => {
+  if (touchLookId === null) return;
+  for (const t of e.changedTouches) {
+    if (t.identifier === touchLookId) {
+      touchLookId = null;
+      break;
+    }
+  }
+}, { passive: true });
+
+canvas.addEventListener("touchcancel", (e) => {
+  if (touchLookId === null) return;
+  for (const t of e.changedTouches) {
+    if (t.identifier === touchLookId) {
+      touchLookId = null;
+      break;
+    }
+  }
+}, { passive: true });
 
 applyDifficulty("normal", false);
 resetPlayer(true);

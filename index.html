@@ -11,7 +11,7 @@
     <canvas id="game" aria-label="3d game canvas"></canvas>
     <div class="hud">
       <h1>64-like 3D Action (Prototype)</h1>
-      <p class="help">Move: WASD / Arrow keys | Jump: Space (Double jump + Wall kick on blue walls) | Dash: Shift | Camera: Mouse Drag / Wheel | Reset: R</p>
+      <p class="help">Move: WASD / Arrow keys / Touch pad | Jump: Space / JUMP | Dash: Shift / DASH | Camera: Mouse Drag / Wheel / CAM buttons | Reset: R</p>
       <label class="difficulty-ui" for="difficulty">Difficulty:
         <select id="difficulty">
           <option value="easy">Easy</option>
@@ -21,6 +21,22 @@
       </label>
       <p id="status" class="status">Collect 5 stars and reach the goal!</p>
       <p id="score" class="score">SCORE: 0 | LIFE: 3 | STARS: 0/5</p>
+    </div>
+    <div class="touch-controls" aria-hidden="true">
+      <div class="touch-cluster move-cluster">
+        <button id="btn-up" class="touch-btn">UP</button>
+        <div class="touch-row">
+          <button id="btn-left" class="touch-btn">LEFT</button>
+          <button id="btn-down" class="touch-btn">DOWN</button>
+          <button id="btn-right" class="touch-btn">RIGHT</button>
+        </div>
+      </div>
+      <div class="touch-cluster action-cluster">
+        <button id="btn-cam-left" class="touch-btn">CAM L</button>
+        <button id="btn-cam-right" class="touch-btn">CAM R</button>
+        <button id="btn-jump" class="touch-btn action">JUMP</button>
+        <button id="btn-dash" class="touch-btn action">DASH</button>
+      </div>
     </div>
   </div>
   <script type="module" src="game.js"></script>
