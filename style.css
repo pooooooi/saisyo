@@ -1,0 +1,76 @@
+:root {
+  --ink: #07253e;
+  --hud-bg: #ffffffd8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: "Trebuchet MS", "Verdana", sans-serif;
+  background: linear-gradient(180deg, #96d9ff, #d8f3ff);
+  color: var(--ink);
+}
+
+#game-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+#game {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.hud {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  max-width: 920px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--hud-bg);
+  border: 2px solid #1f5a85;
+  box-shadow: 0 10px 24px #0730502b;
+}
+
+.hud h1 {
+  margin: 0 0 6px;
+  font-size: clamp(1rem, 1.9vw, 1.4rem);
+}
+
+.help,
+.status,
+.score {
+  margin: 3px 0;
+  font-size: clamp(0.82rem, 1.45vw, 1rem);
+}
+
+.difficulty-ui {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+  font-size: clamp(0.82rem, 1.45vw, 1rem);
+}
+
+.difficulty-ui select {
+  border: 1px solid #1f5a85;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  padding: 4px 8px;
+  font: inherit;
+}
